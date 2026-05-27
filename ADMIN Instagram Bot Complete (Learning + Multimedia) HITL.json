@@ -1,0 +1,1996 @@
+{
+  "name": "ADMIN Instagram Bot Complete (Learning + Multimedia) HITL",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "67981ced-cf8b-45ef-ac99-6a484ddeeb0b",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1136,
+        240
+      ],
+      "id": "b9667c6d-083c-43d9-9292-ec78e74a5a83",
+      "name": "Webhook",
+      "webhookId": "67981ced-cf8b-45ef-ac99-6a484ddeeb0b"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e3211ede-5fde-4bb2-bd42-9b5a564bf492",
+              "name": "body.key",
+              "value": "={{ $json.body.key }}",
+              "type": "string"
+            },
+            {
+              "id": "10aede2f-c173-4e54-b4fa-54382f0b8f0e",
+              "name": "body",
+              "value": "={{ $json.body }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -928,
+        240
+      ],
+      "id": "83068471-d420-492d-bbfc-50a0ac1a6ddc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $('Edit Fields').item.json.body.key }}",
+        "messageData": "={{ JSON.stringify($('Edit Fields').item.json.body) }}",
+        "tail": true
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        240
+      ],
+      "id": "d0f5bff8-5ffc-4d19-b9fb-7be308b96b2a",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "TdTPmzShFmedJp4Y",
+          "name": "Redis test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "message",
+        "key": "={{ $('Edit Fields').item.json.body.key }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        240
+      ],
+      "id": "9b8c4b1f-3fed-4c19-b519-fb4a9c15869c",
+      "name": "Redis1",
+      "credentials": {
+        "redis": {
+          "id": "TdTPmzShFmedJp4Y",
+          "name": "Redis test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse($json.message.last()).key }}",
+                    "rightValue": "={{ $('Edit Fields').item.json.body.key }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    },
+                    "id": "ab6d43fe-6c71-4245-aca9-96f789753d12"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no pasa nada"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8973e839-28f2-4e13-95ee-1aad455dbd43",
+                    "leftValue": "={{ JSON.parse($json.message.last()).ig_last_interaction }}",
+                    "rightValue": "={{ $now.minus(240, 'seconds') }}",
+                    "operator": {
+                      "type": "dateTime",
+                      "operation": "before"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "agarrar"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "263aeb90-eab1-441e-a019-6590ba229ba7",
+                    "leftValue": "={{ JSON.parse($json.message.first()).key }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notExists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no existe"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "policia"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        192,
+        208
+      ],
+      "id": "6cfea170-4a6c-4552-af5f-86877e9269c7",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "amount": 25
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        384,
+        448
+      ],
+      "id": "4b8bf47c-14d8-47b6-ae48-71c1f1cae556",
+      "name": "Wait",
+      "webhookId": "f77a1be8-28c3-47c8-bad6-656af3341696"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Edit Fields').item.json.body.key }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        576,
+        176
+      ],
+      "id": "677ce404-d2ae-45a7-bb79-4d0835695d21",
+      "name": "Redis2",
+      "credentials": {
+        "redis": {
+          "id": "TdTPmzShFmedJp4Y",
+          "name": "Redis test"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        384,
+        32
+      ],
+      "id": "53efd9e6-d083-44f1-8d1e-c0bd8125b041",
+      "name": "No Operation"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        384,
+        304
+      ],
+      "id": "72a49ae6-8145-4af5-b141-3adf3ef90823",
+      "name": "No Operation 1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "message",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        848,
+        80
+      ],
+      "id": "38e1f861-5b98-475b-9c57-23e5ca15b013",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ JSON.parse($json.message) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1072,
+        80
+      ],
+      "id": "951f4ff6-afa2-483a-bf78-e185c0f93ec8",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.last_input_text }}",
+                    "rightValue": "https://lookaside",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "0220b62e-58dd-4862-9eb4-0b0067724ce1"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "archivo"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5cf07f0f-cbbb-4493-b96e-8d3493751a06",
+                    "leftValue": "={{ $json.last_input_text }}",
+                    "rightValue": "https://lookaside",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notContains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "texto"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1296,
+        80
+      ],
+      "id": "0b8cc41e-a169-40c5-b5dc-20aff808847d",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "method": "HEAD",
+        "url": "={{ $json.last_input_text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1504,
+        -80
+      ],
+      "id": "135829b9-eaf7-42b4-9174-a86828044e24",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $binary.data.mimeType }}",
+                    "rightValue": "video/mp4",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ecfd50bd-dcc4-4a10-b746-e624bc49c37b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "109c3a84-ee78-49c0-84b7-05a40d2793df",
+                    "leftValue": "={{ $binary.data.mimeType }}",
+                    "rightValue": "image/jpeg",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "imagen"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        -80
+      ],
+      "id": "663616e8-1c08-4c6b-be97-769d502e7546",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        112
+      ],
+      "id": "6f69523f-2808-4668-a0f4-bdb9ac8fc99e",
+      "name": "No Operation 2"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "=Eres el Analista Visual Experto de la agencia de diseño Neuz Studio. Tu única tarea es analizar las imágenes enviadas por los clientes y generar una descripción técnica y analítica para el Agente Principal de Ventas. \n\nRecuerda: El Agente Principal NO puede ver la imagen, solo leerá tu texto para saber qué servicio cotizar o si debe aprobar un pago. Depende al 100% de tu precisión.\n\nTu respuesta DEBE comenzar siempre con la etiqueta exacta: [IMAGEN]\n\nLuego de la etiqueta, analiza la imagen aplicando estrictamente estas dos reglas:\n\n1. AUDITORÍA DE PAGOS (DETECCIÓN DE FRAUDE):\nSi la imagen intenta ser un comprobante de pago (Mercado Pago, transferencia, PayPal, banco, etc.), debes verificar su autenticidad visual.\n- COMPROBANTE REAL: Si tiene la interfaz gráfica de la app, logos oficiales, tipografías correctas, número de operación y formato de pantalla, extrae: Monto, Moneda, Destinatario y Banco/App.\n- 🚨 COMPROBANTE FALSO (FRAUDE): Si la imagen es un fondo liso (ej. negro o blanco) con texto escrito encima, carece de la interfaz de una app financiera oficial, o parece alterada, DEBES escribir explícitamente en tu reporte: \"ADVERTENCIA: Esta imagen NO es un comprobante válido. Es un fondo con texto escrito que simula ser un pago. Riesgo de fraude. No tomar como pago confirmado.\"\n\n2. CLASIFICACIÓN TÉCNICA DE DISEÑO GRÁFICO (DEDUCCIÓN UNIVERSAL):\nSi la imagen es un diseño o referencia, NO te limites a transcribir textos. Debes identificar profesionalmente qué tipo de pieza es para que el Agente Principal cotice el servicio correcto.\n- Analiza el formato y los elementos visuales para deducir la pieza real (Ej: Flyer vertical, Post cuadrado para Instagram, Tarjeta de presentación, Menú, Banner, Logotipo aislado, vestimenta estampada, etc.).\n- Extrae la información textual más importante (títulos, rubro del negocio, datos clave) que ayude a darle contexto de venta al Agente Principal.\n\nFORMATO DE TU RESPUESTA OBLIGATORIO:\n[IMAGEN] \n- Clasificación: (Indica si es Comprobante Válido, Comprobante Falso, o el Tipo de Pieza de Diseño Exacta).\n- Descripción Analítica: (Redacta acá tu análisis detallado basándote en las reglas anteriores, dándole todo el contexto técnico exacto al Agente Principal).",
+        "imageUrls": "={{ $('Edit Fields1').item.json.last_input_text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        1920,
+        -64
+      ],
+      "id": "aeac59fa-c394-467c-b776-c70783ee47a3",
+      "name": "Analyze image",
+      "credentials": {
+        "openAiApi": {
+          "id": "gJQ9jQW8CU9k2Spi",
+          "name": "OpenAi (VerAutos)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        2128,
+        -240
+      ],
+      "id": "fdadcf87-0333-480b-96fa-12de7ac905d2",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "gJQ9jQW8CU9k2Spi",
+          "name": "OpenAi (VerAutos)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "849387c5-158c-4154-aa45-56d86f6f7375",
+              "name": "message",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "329d9226-df2d-41eb-863d-a08a0a279fb8",
+              "name": "hora_llegada",
+              "value": "={{ $('Edit Fields1').item.json.ig_last_interaction }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2336,
+        -240
+      ],
+      "id": "9c40f501-d0ab-428c-9acd-355f84e9084f",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "849387c5-158c-4154-aa45-56d86f6f7375",
+              "name": "message",
+              "value": "={{ $json['0'].content[0].text }}",
+              "type": "string"
+            },
+            {
+              "id": "329d9226-df2d-41eb-863d-a08a0a279fb8",
+              "name": "hora_llegada",
+              "value": "={{ $('Edit Fields1').item.json.ig_last_interaction }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2128,
+        -64
+      ],
+      "id": "9743e48d-4c46-4d54-aa97-a2d7647b3438",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "849387c5-158c-4154-aa45-56d86f6f7375",
+              "name": "message",
+              "value": "={{ $('Edit Fields1').item.json.last_input_text }}",
+              "type": "string"
+            },
+            {
+              "id": "329d9226-df2d-41eb-863d-a08a0a279fb8",
+              "name": "hora_llegada",
+              "value": "={{ $('Edit Fields1').item.json.ig_last_interaction }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1504,
+        208
+      ],
+      "id": "64e7317c-a9a3-45f6-80bd-cba323bdb44a",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2544,
+        160
+      ],
+      "id": "87fec382-1a0f-4e14-8630-c5affecd04e4",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "hora_llegada"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        2736,
+        176
+      ],
+      "id": "226b85d5-e64a-4666-bd12-a9500d4d57eb",
+      "name": "Sort"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "message"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2928,
+        176
+      ],
+      "id": "bc12432d-a77d-4102-9f7d-28cae7b3f2a7",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cd310420-0284-4b58-9eea-3c6bb2467bfa",
+              "name": "Input",
+              "value": "={{ $json.message.join(\" \") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3120,
+        176
+      ],
+      "id": "1b782269-9319-43b9-bbd5-8d8e5e69f891",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3056,
+        400
+      ],
+      "id": "5f3f9e80-7f3c-49a6-a7c6-d74f84628f17",
+      "name": "OpenAI Chat Model2",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "openAiApi": {
+          "id": "gJQ9jQW8CU9k2Spi",
+          "name": "OpenAi (VerAutos)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Trabaja y recorda chats anteriores con los clientes. ",
+        "tableName": {
+          "__rl": true,
+          "value": "n8n_chat_histories",
+          "mode": "list",
+          "cachedResultName": "n8n_chat_histories"
+        },
+        "topK": 10,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        3632,
+        336
+      ],
+      "id": "6312c671-e091-4a46-94e0-33de3a192710",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "WZETzkfN1F4MDmoC",
+          "name": "Supabase (AdminNeuz)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3632,
+        496
+      ],
+      "id": "17409470-af0a-45f9-8302-57e4be61bef4",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "gJQ9jQW8CU9k2Spi",
+          "name": "OpenAi (VerAutos)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.key }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        3216,
+        400
+      ],
+      "id": "cf23e9ea-84ec-463b-85b4-6b4ffcd8e3ed",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "WHoHMrywPnuDBaiS",
+          "name": "Postgres (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Buffer Redis",
+        "height": 672,
+        "width": 944
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -224,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "93c05aef-8f0e-463b-9c01-532013dfbd90",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Distincion de Mensaje (Texto, Imagen, Audio)",
+        "height": 672,
+        "width": 1840,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        832,
+        -272
+      ],
+      "typeVersion": 1,
+      "id": "e12c82f6-88c9-4238-996d-c70c958810ab",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5de0a9f2-49f4-464f-9189-aa721858d765",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "[necesita]",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3648,
+        176
+      ],
+      "id": "5328d5ce-316e-4205-9749-522d2e286376",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.manychat.com/fb/sending/sendContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"subscriber_id\": {{ $('Webhook').item.json.body.id }},\n  \"data\": {\n    \"version\": \"v2\",\n    \"content\": {\n      \"type\": \"instagram\",\n      \"messages\": [\n        {\n          \"type\": \"text\",\n          \"text\": {{ JSON.stringify($json.output) }}\n        }\n      ]\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4144,
+        192
+      ],
+      "id": "f91cad67-33b7-4e09-ae1b-946dd43b0350",
+      "name": "HTTP Request (FINAL)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "15iviZLWm1P2gOTI",
+          "name": "Neuz.Studio"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1hqCNCVCRmGAsBdj925GmEbFByefQiU190c96S2XIXLY/edit?tab=t.0#heading=h.yqumdtej6uts"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        3360,
+        704
+      ],
+      "id": "9cc6723f-1ea1-4a25-9565-e1bc2aa72e8e",
+      "name": "Politicas de trabajo",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "6TvOVKbZ9Mm5Jade",
+          "name": "Google Docs (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6eba2b85-3acf-43fe-995a-818e846f7699",
+              "leftValue": "={{ $('Code in JavaScript').item.json.should_close }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4352,
+        192
+      ],
+      "id": "d9f4c37c-7119-4e6a-8e53-3aea9edd44ce",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.manychat.com/fb/sending/sendFlow",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"subscriber_id\": {{ $('Webhook').item.json.body.id }},\n  \"flow_ns\": \"content20260211124631_841493\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4576,
+        176
+      ],
+      "id": "dfc05212-d2ce-491a-97b8-2a52aef2f5f7",
+      "name": "HTTP Request (MCHAT)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "15iviZLWm1P2gOTI",
+          "name": "Neuz.Studio"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Edit Fields1').item.json.last_input_text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1920,
+        -240
+      ],
+      "id": "71b14cec-aae6-45bf-b381-c9c625297ff0",
+      "name": "HTTP Request (TRANSCRIPCION)"
+    },
+    {
+      "parameters": {
+        "content": "## Base de Conocmiento",
+        "height": 224,
+        "width": 1088
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2992,
+        640
+      ],
+      "typeVersion": 1,
+      "id": "6352725f-4de2-4aa7-b13b-75fb606ba075",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map((item) => {\n  let text = item.json.output || \"\";\n  \n  // Definimos ambos triggers (Venta y Reunión)\n  const triggerVenta = \"perfecto, entre los proximos 2 dias habiles se contactara un diseñador con vos\";\n  const triggerReunion = \"genial, te esperamos en la reunion\";\n  const tag = \"[STATUS: CLOSED]\";\n\n  // 1. Detección de cierre (evalúa si tiene la frase de venta, la de reunión, o directamente el tag)\n  item.json.should_close = text.toLowerCase().includes(triggerVenta.toLowerCase()) || \n                           text.toLowerCase().includes(triggerReunion.toLowerCase()) ||\n                           text.includes(tag);\n\n  // 2. Limpieza INTELIGENTE\n  let cleanOutput = text\n    .replace(tag, \"\") // Borramos el tag técnico\n    .replace(/\\n{3,}/g, '\\n\\n') // Si hay 3 o más saltos de línea seguidos, deja solo 2.\n    .trim(); // Quita espacios vacíos al inicio y final\n\n  item.json.output = cleanOutput;\n  \n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3936,
+        192
+      ],
+      "id": "c980c3dc-b7d6-46ac-95d3-039d3cff94c2",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=### CONTEXTO DEL CHAT ACTUAL ###\n- **Mensaje del cliente:** {{$('Edit Fields5').item.json.Input }}\n\n### TAREA ###\nAnaliza el mensaje del cliente y responde siguiendo tus protocolos de Account Manager.",
+        "options": {
+          "systemMessage": "=<rol_y_objetivo>\nEres el Account Manager de Neuz Studio (agencia de marketing y diseño). Tu objetivo es calificar leads por mensaje de Instagram, entender su necesidad y guiarlos a una venta o a agendar una reunión.\n</rol_y_objetivo>\n\n<personalidad_y_estilo>\n- TONO OBLIGATORIO: Persona real del equipo escribiendo desde su celular.\n- VOSEO ARGENTINO: Trata al cliente de \"vos\" siempre (\"¿Cómo estás?\", \"fijate\", \"decime\", \"querés\").\n- LENGUAJE PROHIBIDO: \"Estimado\", \"Cordialmente\", \"Aguardamos su respuesta\", \"En qué te puedo ayudar\", o sonar como asistente virtual/IA.\n- FORMATO DE MENSAJE: \n  - Máximo 800 caracteres por mensaje, contanto los espacios.\n  - Emojis con moderación (1 o 2 máximo por mensaje).\n  - Solo signos de interrogación/exclamación de cierre (? !).\n  - Listas: Si pasas precios o beneficios, usa emojis como viñetas (ej: 💵, ✅, 🛠️), separa con salto de línea (\\n) y mantén descripciones breves.\n- REGLA DEL PING-PONG (CRÍTICA): Llevá la conversación paso a paso. Haz MÁXIMO 1 o 2 preguntas por mensaje. Espera siempre la respuesta del cliente antes de avanzar. NO envíes toda la información de golpe.\n- POSTURA REACTIVA, NO SERVIL (CRÍTICO):\n1. NO hagas preguntas de seguimiento (follow-up questions) al final de tus mensajes.\n2. Si ya entregaste la información solicitada o los links, finaliza el mensaje ahí.\n3. Evita frases como \"¿Querés que te ayude con algo más?\" o \"¿Te gustaría ver más ejemplos?\".\n4. Tu objetivo es ser eficiente y directo. Una vez cumplida la tarea, termina la conversación cordialmente sin invitar a más interacción innecesaria.\n<personalidad_y_estilo>\n\n<uso_de_herramientas>\nDEBES consultar tus herramientas/documentos para responder:\n1. \"Metodología de trabajo\": Expectativas post-venta.\n2. \"Políticas de trabajo\": Reglas, correcciones y horarios.\n3. \"Precios y servicios\": Extraer servicios y precios (Usa el nombre exacto de la columna \"Servicio\").\n4. \"Formas de pago\": Opciones de cobro.\n5. \"Ejemplos de trabajos\": Para compartir links de referencias de nuestros trabajos o portfolio.\n6. \"Urgencia\": Recargos por entregas rápidas.\n7. \"Registrar Ventas y Tareas\": Ejecutar SOLO cuando el pago esté confirmado.\n</uso_de_herramientas>\n\n<limites_comerciales_estrictos>\n- LÍMITE DE PLATAFORMA: Operas SOLO por Instagram. Para mostrar trabajos realizados, nuestro portfolio, tu única herramienta es enviar links de \"Ejemplos de trabajos\". NUNCA ofrezcas mails, adjuntos, ni PDFs.\n- REGLA DE PAÍS Y MONEDA (BLOQUEO CRÍTICO): \n  - Si no sabes el país del cliente: Pregúntalo de forma natural ANTES de dar cualquier precio. NO des montos numéricos hasta saber su país.\n  - Si es de ARGENTINA: Usa ÚNICAMENTE Pesos Argentinos (\"ARS\").\n  - Si es del EXTERIOR: Usa ÚNICAMENTE Dólares (\"USD\").\n  - NUNCA mezcles monedas ni inventes frases como \"o su equivalente en pesos\".\n- SERVICIOS FUERA DE LÍMITE: NO hacemos 3D, renders, ilustración hiperrealista, producción física, filmaciones (solo editamos), ni Ads. NO armamos propuestas previas, bocetos gratis ni pruebas. El diseño arranca tras el pago.\n- ARCHIVOS EDITABLES Y CANVA (BLOQUEO CRÍTICO): Tienes terminantemente PROHIBIDO ofrecer, vender o entregar \"archivos editables\", \"archivos fuente\", \"másters\", o \"plantillas en Canva\", Illustrator, Photoshop, etc. Solo entregamos diseños finales cerrados (JPG, PNG, MP4) y mockups para previsualizar. Si lo piden, aclara que por política del estudio solo se entregan archivos cerrados.\n- LIMITACIONES CREATIVAS Y DE IDEACIÓN: No realizamos el proceso creativo desde cero. NO inventamos ideas a partir de audios, canciones o conceptos abstractos, ni imaginamos por el cliente. Si un cliente pide que \"propongan un concepto\" o \"escuchen un audio para inspirarse\", debes aclarar amablemente que luego del pago, el diseñador necesitará que le provean una idea clara.\n- REGLA DE REFERENCIAS (BLOQUEO CRÍTICO): Tienes terminantemente PROHIBIDO pedirle al cliente que te envíe referencias, ejemplos de estilo, fotos o un brief. La recolección de referencias creativas es tarea exclusiva del diseñador humano y se hace ÚNICAMENTE DESPUÉS de que el pago esté confirmado. Si el cliente te manda referencias por su cuenta, agradécele, pero NO le pidas más detalles creativos.\n</limites_comerciales_estrictos>\n\n<flujo_de_operacion>\nSigue este orden cronológico para atender cada consulta:\n\nPASO 0: SALUDO INICIAL AMIGABLE\n- Si el cliente envía UNICAMENTE un saludo (ej: \"Hola\", \"Buenas\", \"Qué tal\") sin explicar qué necesita:\n  - Responde con un saludo cálido, natural y abierto. (Ej: \"¡Hola! ¿Cómo andás? Contame, ¿qué andabas buscando?\"). \n  - Tienes PROHIBIDO intentar adivinar, enlistar servicios, o preguntar si busca algo mensual/puntual en este primer mensaje. \n  - DETENTE AHÍ y espera a que el cliente te explique su necesidad.\n\nPASO 1: FILTRO DE VIABILIDAD Y DERIVACIÓN\n- POSTULANTES / BÚSQUEDA LABORAL: Si una persona escribe buscando trabajo, ofreciendo sus servicios como diseñador o queriendo sumarse al equipo, recomendale estar atento/a a las historias de Instagram donde siempre publican cuando buscan a alguien.\n- OFERTA DE SERVICIO: Si una persona escribe ofreciendo sus servicios de cualqueir tipo, ya sea que este vendiendo una aplicacion, algun software o cualquier cosa que requiera que \"NOSOTROS\" lo contratemos a èl, agradécele el interés y explícale amablemente que por el momento no estamos buscando ese tipo de servicios. \n- Si el cliente pide algo que está en los \"Servicios Fuera de Límite\" -> Explica amablemente que no hacemos eso y finaliza.\n- REGLA DE DERIVACIÓN Y \"GRISES\" (CRÍTICA): Evalúa si el pedido cae en:\n  A) Soportes Físicos: Pide aplicar diseño en ropa, merch, packaging, locales, vidrieras, envases, etc.\n  B) Fuera de Catálogo: Pide piezas editoriales, portadas musicales, cartas o piezas que NO estén listadas textualmente en \"Precios y servicios\".\n  C) Links de Ejemplo: El cliente envía algún enlace/link externo como referencia o ejemplo de lo que busca.\n-> ACCIÓN OBLIGATORIA: Si se cumple A, B o C, tienes PROHIBIDO cotizar a medias o intentar salvar la venta. Escribe ÚNICA Y EXCLUSIVAMENTE el comando en texto plano:\n[necesita]\nTienes prohibido saludar, dar explicaciones o usar emojis. Solo realiza esa acción exacta.\n\nPASO 2: DESAMBIGUACIÓN (Si pasó el Filtro 1)\n- Si el pedido es ambiguo (\"necesito un diseño\") -> Pregunta de forma natural qué busca específicamente para clasificarlo. NO asumas que son \"Adaptaciones\".\n\nPASO 3: COTIZACIÓN (Solo si el servicio está en \"Precios y servicios\")\n- CLIENTE TIPO A - ESTRATEGIA: Personas Profesionales/Emprendedores que buscan potenciar su marca, crecer en Instagram o necesitan ayuda en marketing/publicidad.\n  1. Si ya clasificaste a este usuario como TIPO A, antes de agendar una reunion explicale explícitamente que para esto no ofrecemos un \"paquete de diseño\" tradicional, sino un Servicio de Estrategia de Marketing, Donde desarrollamos una estrategia y una campaña personalizada para potenciar su marca, donde el diseño es solo una de las herramientas que usamos para lograr el objetivo.\nCierre: Decile que esto requiere un análisis de su caso en una reunión. Envía el link: https://calendly.com/neuzgraphics/30min\n- CLIENTE TIPO B (Retainer/Mensual/Gestión de redes): Son clientes que buscan tener una constancia con los servicios tradicionales que ofrecemos en la herramienta \"Precios y servicios\". Explica que requiere una estrategia armada. Pídele que agende reunión enviando el link: https://calendly.com/neuzgraphics/30min (No agendes por él).\n- CLIENTE TIPO C (Servicio único/Spot): \n  1. Aplica la REGLA DE PAÍS Y MONEDA.\n  2. Extrae y ofrécele TODAS las opciones o paquetes disponibles relacionados al servicio que busca. (Ej: Si pide un Logotipo, envíale el Logo base y todos los \"Packs Emprendedor\" que figuren en tu documento). Utiliza siempre el formato de listas con emojis para presentarlos.\n  3. Aclara que la demora es de 3-4 días hábiles y que incluye correcciones ilimitadas bajo la misma idea inicial.\n  4. Pregunta para cuándo lo necesita y DETENTE AHÍ (ESPERA su respuesta).\n\nPASO 4: REGLA DE URGENCIA\n- SOLO si el cliente indica que lo necesita en MENOS de 3-4 días hábiles, calcula el recargo con el documento \"Urgencia\".\n- Condiciones a aclarar: Se paga por adelantado.\n- DEBES incluir esta frase exacta: \"Tené en cuenta que la urgencia reduce los días de la primera entrega. Una vez enviada, las correcciones se trabajan de manera continua, con una tanda por día hábil, para garantizar rapidez sin perder calidad.\"\n- Entregas en el mismo día: Están PROHIBIDAS. Lo máximo es aplicar Urgencia Alta para entregar al día siguiente.\n\nPASO 5: CIERRE Y PAGOS\n- Tras la aceptación del presupuesto, envía \"Metodología de trabajo\" y \"Formas de pago\".\n- PREGUNTA DE CIERRE: Pregúntale únicamente con qué forma de pago prefiere avanzar.\n- Aclaraciones extra: \n  - Flyers animados: Siempre explica que se cobra el \"Flyer base\" + la animación. \n  - Animaciones externas: Explica que NO animamos diseños que no sean de Neuz Studio.\n</flujo_de_operacion>\n\n<protocolo_de_reuniones>\n1. Tras enviar el link de Calendly a un CLIENTE TIPO A, espera a que el cliente confirme que ya agendó su turno.\n2. Si el cliente confirma que ya agendó (ej: \"listo\", \"ya agendé\", \"ahí saqué turno\"), responde EXACTAMENTE esta frase: \"Genial, te esperamos en la reunion [STATUS: CLOSED]\"\n</protocolo_de_reuniones>\n\n<protocolo_de_pagos>\n1. Si el cliente dice \"ya pagué\" sin foto, exige amablemente la captura.\n2. Al recibir la captura, verifica los datos con \"Formas de pago\".\n3.a.Si el pago es sin urgencia, responde EXACTAMENTE: \"perfecto, entre los proximos 2 dias habiles se contactara un diseñador con vos [STATUS: CLOSED]\"\n3.b.Si el pago es con urgencia, responde EXACTAMENTE: \"perfecto, en el proximo dia habil se contactara un diseñador con vos [STATUS: CLOSED]\" \n4. INMEDIATAMENTE después, ejecuta la herramienta \"Registrar Ventas y Tareas\".\n</protocolo_de_pagos>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        3360,
+        176
+      ],
+      "id": "14d653e1-486f-4503-b0d8-8e8c7eefad8b",
+      "name": "AI Agent (MAIN)"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1-V3Nbm1dHPIBu7pNudo2qEGUO8SIZlj6kEGiXRgJFl0/edit?tab=t.0"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        3632,
+        704
+      ],
+      "id": "70ea58f4-4254-4053-8fd3-7664c3302dda",
+      "name": "Metodología de trabajo",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "6TvOVKbZ9Mm5Jade",
+          "name": "Google Docs (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## GUIA\n**1) Conectar la cuenta de Instagram a ManyChat** \n\n**2) Crear una pagina de facebook** \n\n**3) Crear un portafolio en Meta Business Suite** \n\n**4) Vincular ManyChat con Meta** \n\n**5) Copiar el Production URL del  Webhook principal a la automatizacion de ManyChat** ",
+        "height": 240,
+        "width": 608
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1440,
+        -272
+      ],
+      "id": "76864019-b703-4a3c-9354-aad00a74b270",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1y9c1IWVYv7hczYyWmC0_b09CzGCIkJogv8iMpX9LPz8/edit?tab=t.0#heading=h.3ww61v5iupnd"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        3792,
+        704
+      ],
+      "id": "ce771603-d8b6-42b7-b37c-9e5fa552ccc1",
+      "name": "Ejemplos de trabajos",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "6TvOVKbZ9Mm5Jade",
+          "name": "Google Docs (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1CWh1S3RFqtUj4p28-i2ZH9N6mPVeN37WMp0cpGs1sGw/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1CWh1S3RFqtUj4p28-i2ZH9N6mPVeN37WMp0cpGs1sGw/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        3504,
+        704
+      ],
+      "id": "ebdfb002-2519-4367-a8ca-6995bf05ef6a",
+      "name": "Formas de pago",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LyN2lwmbl6mTTuWe",
+          "name": "Google Sheets (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1s4kNddfboJhmtKVbSD5l2vQ3EB5weU34hV7NeHN9HLc/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1s4kNddfboJhmtKVbSD5l2vQ3EB5weU34hV7NeHN9HLc/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        3952,
+        704
+      ],
+      "id": "b62164a7-dec9-4d09-94c1-9d5a5ae4566d",
+      "name": "Urgencia",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LyN2lwmbl6mTTuWe",
+          "name": "Google Sheets (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7271d0b2-5aaa-43c5-bb0d-6e3a3e8063cd",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -576,
+        240
+      ],
+      "id": "c9056317-19be-4211-8d07-3f40f2a5552e",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "message",
+        "key": "=dedup_{{ $json.body.id }}_{{ $json.body.last_input_text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        240
+      ],
+      "id": "983f22b5-514d-46c2-a333-d49dc09e1335",
+      "name": "antidup",
+      "alwaysOutputData": true,
+      "credentials": {
+        "redis": {
+          "id": "TdTPmzShFmedJp4Y",
+          "name": "Redis test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=dedup_{{ $('Webhook').item.json.body.id }}_{{ $('Webhook').item.json.body.last_input_text }}",
+        "value": "1",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        128
+      ],
+      "id": "9a9a6b72-8314-41d7-b9b4-45eed67483ed",
+      "name": "Redis wait",
+      "credentials": {
+        "redis": {
+          "id": "TdTPmzShFmedJp4Y",
+          "name": "Redis test"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        352
+      ],
+      "id": "ab0e7f85-2558-49fc-8d7b-f1f3d3c013f9",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "servicios_precios"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        3200,
+        704
+      ],
+      "id": "49bd1702-2ba0-4337-966f-31930573ea66",
+      "name": "Precios y Servicios",
+      "credentials": {
+        "supabaseApi": {
+          "id": "WZETzkfN1F4MDmoC",
+          "name": "Supabase (AdminNeuz)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "consultas_ia",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "pregunta",
+              "fieldValue": "={{ $('Webhook').first().json.body.last_input_text }}"
+            },
+            {
+              "fieldId": "ig_id",
+              "fieldValue": "={{ $('Webhook').first().json.body.id }}"
+            },
+            {
+              "fieldId": "respondida",
+              "fieldValue": "={{ false }}"
+            },
+            {
+              "fieldId": "instagram_usuario",
+              "fieldValue": "={{ $('Webhook').item.json.body.ig_username }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4144,
+        0
+      ],
+      "id": "8c687a6c-ffce-42a0-8d27-68f63805d130",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "WZETzkfN1F4MDmoC",
+          "name": "Supabase (AdminNeuz)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  // 1. Viajamos al nodo 'Aggregate' para traer el array original separado por mensajes\n  const arrayMensajes = $('Aggregate').first().json.message;\n\n  if (arrayMensajes && Array.isArray(arrayMensajes)) {\n    // 2. Filtramos mágicamente: guardamos todo EXCEPTO lo que contenga la palabra \"[IMAGEN]\"\n    const soloTextoUsuario = arrayMensajes.filter(mensaje => !mensaje.includes('[IMAGEN]'));\n    \n    // 3. Ahora sí, concatenamos pero solo los mensajes reales del cliente\n    item.json.mensaje_limpio = soloTextoUsuario.join(\" \").trim();\n  } else {\n    // Fallback de seguridad\n    item.json.mensaje_limpio = $('Edit Fields5').first().json.Input; \n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3936,
+        0
+      ],
+      "id": "74e2e2cb-0d56-4d92-83d7-88b33ca15fee",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://automatizaciones-n8n-evolution-api.rs2pvp.easypanel.host/message/sendText/neuz-bot",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "apikey",
+              "value": "D795DE4BBF0C-470B-B041-1688A14D2746"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"5491130482828\",\n  \"text\": \"Hola Neuz, hay una consulta nueva para responder de {{ $('Webhook').item.json.body.name }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4352,
+        0
+      ],
+      "id": "af16781f-1e5b-496a-a585-0ad33aa16112",
+      "name": "HTTP Request (EVOLUTION API)1",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "description": "\"Utilizá esta herramienta para extraer y enviar todos los campos requeridos para el registo de ventas y tareas\"",
+        "workflowId": {
+          "__rl": true,
+          "value": "lmyf0lYdVLrEIqnQ",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/lmyf0lYdVLrEIqnQ",
+          "cachedResultName": "Registro Ventas y Tareas"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fieldMontoPago": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldMontoPago', ``, 'number') }}",
+            "fieldCliente": "={{ $('Webhook').item.json.body.ig_username }}",
+            "fieldQueCompro": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldQueCompro', ``, 'string') }}",
+            "fieldPais": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldPais', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fieldCliente",
+              "displayName": "fieldCliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "fieldQueCompro",
+              "displayName": "fieldQueCompro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "fieldMontoPago",
+              "displayName": "fieldMontoPago",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "fieldPais",
+              "displayName": "fieldPais",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        3040,
+        704
+      ],
+      "id": "cec1fab5-1333-4219-93a5-ccf57b86e211",
+      "name": "Registrar Ventas y Tareas"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "automatizaciones-n8n-n8n.rs2pvp.easypanel.host",
+            "user-agent": "ManyChat",
+            "content-length": "920",
+            "content-type": "application/json; charset=utf-8",
+            "x-forwarded-for": "18.185.83.57",
+            "x-forwarded-host": "automatizaciones-n8n-n8n.rs2pvp.easypanel.host",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "2c973c6ba220",
+            "x-real-ip": "18.185.83.57",
+            "accept-encoding": "gzip"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "key": "user:130996205",
+            "id": "130996205",
+            "page_id": "",
+            "user_refs": [],
+            "status": "active",
+            "first_name": "Enmanuel",
+            "last_name": "Brahyan Nuñez",
+            "name": "Enmanuel Brahyan Nuñez",
+            "gender": null,
+            "profile_pic": "https://app.manychat.com/ava/4392403/130996205/d4baad20bba7ae38c1dc5c27fcc6aa34",
+            "locale": null,
+            "language": null,
+            "timezone": "UTC±00",
+            "live_chat_url": "https://app.manychat.com/fb4392403/chat/130996205",
+            "last_input_text": "Un pack de diseños para oversizes a partir de mi logo",
+            "optin_phone": false,
+            "phone": null,
+            "optin_email": false,
+            "email": null,
+            "subscribed": "2026-04-29T09:52:51-03:00",
+            "last_interaction": null,
+            "ig_last_interaction": "2026-04-30T11:36:17-03:00",
+            "last_seen": null,
+            "ig_last_seen": "2026-04-30T11:36:17-03:00",
+            "is_followup_enabled": true,
+            "ig_username": "adicto_alos_dibujos",
+            "ig_id": 1632788728031376,
+            "whatsapp_phone": null,
+            "optin_whatsapp": false,
+            "phone_country_code": null,
+            "last_growth_tool": null,
+            "custom_fields": {}
+          },
+          "webhookUrl": "https://automatizaciones-n8n-n8n.rs2pvp.easypanel.host/webhook/67981ced-cf8b-45ef-ac99-6a484ddeeb0b",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "antidup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "Redis1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "No Operation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Redis2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Redis1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis2": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (TRANSCRIPCION)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request (FINAL)": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Politicas de trabajo": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (MCHAT)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request (TRANSCRIPCION)": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (FINAL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent (MAIN)": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Metodología de trabajo": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejemplos de trabajos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formas de pago": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Urgencia": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Redis wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "antidup": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis wait": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Precios y Servicios": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (EVOLUTION API)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Ventas y Tareas": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "d58295b9-d9bb-4a43-a448-a1733dbda9b2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e9aa4fcc36de01cb192faebc915f2a52eb3f1080b8d8c878f24c05c1982b6938"
+  },
+  "id": "y0JJ941c2Ho2ZPTv",
+  "tags": [
+    {
+      "updatedAt": "2026-04-21T19:02:37.107Z",
+      "createdAt": "2026-04-21T19:02:37.107Z",
+      "id": "mxuEARCBnEAJbeCi",
+      "name": "Dashboard-NeuzStudio"
+    }
+  ]
+}
