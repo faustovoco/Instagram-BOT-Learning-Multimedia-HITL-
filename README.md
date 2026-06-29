@@ -10,9 +10,6 @@ This repository contains a collection of automation workflows built in [n8n](htt
 *   **Option 2: Manychat:** Integration to efficiently centralize and route client inquiries.
 *   **Sales & Tasks Registry:** Automatic synchronization of tasks and billing.
 
-### Targan (Growth & B2B)
-*   **Daily Google Maps Leads:** Automated scraper and classifier to extract and process B2B prospects directly from Google Maps.
-
 ## 🚀 How to import these workflows
 
 1. Download the `.json` file of the workflow you need.
@@ -39,9 +36,6 @@ Este repositorio contiene una colección de flujos de trabajo de automatización
 *   **Opcion 1: Chatwoot Bot:** Integración para centralizar y derivar consultas de clientes de manera eficiente.
 *   **Opcion 2: Manychat:** Integración para centralizar y derivar consultas de clientes de manera eficiente.
 *   **Registro Ventas y Tareas:** Sincronización automática de tareas y facturación.
-
-### Targan (Growth & B2B)
-*   **Leads diarios Google Maps:** Scraper y clasificador automatizado para extraer y procesar prospectos B2B directamente desde Google Maps.
 
 ## 🚀 Cómo importar estos flujos
 
