@@ -1,0 +1,1910 @@
+{
+  "name": "Chatwoot Bot (Neuz Studio)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatwoot",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1552,
+        112
+      ],
+      "id": "1b1ef3cb-84ad-46de-bd83-18d13bd062b2",
+      "name": "Webhook",
+      "webhookId": "78a8484b-1a98-487b-b9b2-05db88b53ecf"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Variables').item.json['audio/imagen'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -544,
+        -32
+      ],
+      "id": "63e7fcd9-26b3-410f-8f8b-d858793a5f74",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $binary.data.mimeType }}",
+                    "rightValue": "audio/opus",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ecfd50bd-dcc4-4a10-b746-e624bc49c37b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "109c3a84-ee78-49c0-84b7-05a40d2793df",
+                    "leftValue": "={{ $binary.data.mimeType }}",
+                    "rightValue": "image/jpeg",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "imagen"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -336,
+        -32
+      ],
+      "id": "44eca5b2-368c-428e-a505-f20fe9f051bc",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "=Eres el Analista Visual Experto de la agencia de diseño Neuz Studio. Tu única tarea es analizar las imágenes enviadas por los clientes y generar una descripción técnica y analítica para el Agente Principal de Ventas. \n\nRecuerda: El Agente Principal NO puede ver la imagen, solo leerá tu texto para saber qué servicio cotizar o si debe aprobar un pago. Depende al 100% de tu precisión.\n\nTu respuesta DEBE comenzar siempre con la etiqueta exacta: [IMAGEN]\n\nLuego de la etiqueta, analiza la imagen aplicando estrictamente estas dos reglas:\n\n1. AUDITORÍA DE PAGOS (DETECCIÓN DE FRAUDE):\nSi la imagen intenta ser un comprobante de pago (Mercado Pago, transferencia, PayPal, banco, etc.), debes verificar su autenticidad visual.\n- COMPROBANTE REAL: Si tiene la interfaz gráfica de la app, logos oficiales, tipografías correctas, número de operación y formato de pantalla, extrae: Monto, Moneda, Destinatario y Banco/App.\n- 🚨 COMPROBANTE FALSO (FRAUDE): Si la imagen es un fondo liso (ej. negro o blanco) con texto escrito encima, carece de la interfaz de una app financiera oficial, o parece alterada, DEBES escribir explícitamente en tu reporte: \"ADVERTENCIA: Esta imagen NO es un comprobante válido. Es un fondo con texto escrito que simula ser un pago. Riesgo de fraude. No tomar como pago confirmado.\"\n\n2. CLASIFICACIÓN TÉCNICA DE DISEÑO GRÁFICO (DEDUCCIÓN UNIVERSAL):\nSi la imagen es un diseño o referencia, NO te limites a transcribir textos. Debes identificar profesionalmente qué tipo de pieza es para que el Agente Principal cotice el servicio correcto.\n- Analiza el formato y los elementos visuales para deducir la pieza real (Ej: Flyer vertical, Post cuadrado para Instagram, Tarjeta de presentación, Menú, Banner, Logotipo aislado, vestimenta estampada, etc.).\n- Extrae la información textual más importante (títulos, rubro del negocio, datos clave) que ayude a darle contexto de venta al Agente Principal.\n\nFORMATO DE TU RESPUESTA OBLIGATORIO:\n[IMAGEN] \n- Clasificación: (Indica si es Comprobante Válido, Comprobante Falso, o el Tipo de Pieza de Diseño Exacta).\n- Descripción Analítica: (Redacta acá tu análisis detallado basándote en las reglas anteriores, dándole todo el contexto técnico exacto al Agente Principal).",
+        "imageUrls": "={{ $('Variables').item.json['audio/imagen'] }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -128,
+        48
+      ],
+      "id": "ad2f0b03-15dc-46c9-b28c-92b01bb0e732",
+      "name": "Analyze image",
+      "credentials": {
+        "openAiApi": {
+          "id": "vAoStjMPqy9711cA",
+          "name": "OpenAi (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        64,
+        -144
+      ],
+      "id": "5c97b61e-2f38-4f7d-85f8-1b7994b4d688",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "vAoStjMPqy9711cA",
+          "name": "OpenAi (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "849387c5-158c-4154-aa45-56d86f6f7375",
+              "name": "message",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        -144
+      ],
+      "id": "1b4a7206-0b24-4745-bcd4-53b141629b69",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "849387c5-158c-4154-aa45-56d86f6f7375",
+              "name": "message",
+              "value": "={{ $json['0'].content[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        48
+      ],
+      "id": "804e7fc6-f7d8-47c7-b97b-26b7879043f4",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dfa65010-0e40-4147-a555-a90c928e924a",
+              "name": "message",
+              "value": "={{ $('Variables').item.json.message_content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -544,
+        336
+      ],
+      "id": "3c55f394-2f7f-46a2-be62-90446912f35b",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['audio/imagen'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -128,
+        -144
+      ],
+      "id": "2521eadf-30be-4e4a-ad98-94176fc48fef",
+      "name": "HTTP Request (TRANSCRIPCION)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "21a025be-8a57-4491-bfd3-027b1e8cd758",
+              "leftValue": "={{ $json['audio/imagen'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -720,
+        128
+      ],
+      "id": "3e9c9f4f-0be9-4519-bb93-f82e0a99f84c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $('Variables').item.json.account_id }}",
+        "messageData": "={{ JSON.stringify({\n\"mensaje\" : $('Mensaje unificado').item.json.mensaje,\n\"time\" : $('Variables').item.json.time_stamp,\n\"id\" : $('Variables').item.json.account_id\n}) }}",
+        "tail": true
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        -176
+      ],
+      "id": "ef7a110d-e996-4786-a9ff-f4492e640347",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "OkUy9ZFGGcMJSJXm",
+          "name": "NeuzStudioCache2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1ed54f59-33a2-4d79-bb34-49dccc208037",
+              "name": "account_id",
+              "value": "={{ $json.body.conversation.contact_inbox.contact_id }}",
+              "type": "string"
+            },
+            {
+              "id": "cddf8f9a-fc3c-4fee-bb0d-30378ff5a5ad",
+              "name": "conversation_id",
+              "value": "={{ $json.body.conversation.messages[0].conversation_id }}",
+              "type": "string"
+            },
+            {
+              "id": "47a72004-d3a2-41d2-a17a-2ad043809b5b",
+              "name": "message_type",
+              "value": "={{ $json.body.conversation.messages[0].message_type }}",
+              "type": "string"
+            },
+            {
+              "id": "4ac0b259-9d1d-4efc-9515-b227014655a6",
+              "name": "user_name",
+              "value": "={{ $json.body.conversation.messages[0].sender.name }}",
+              "type": "string"
+            },
+            {
+              "id": "9b328149-dd67-4de4-826c-690f953b19ed",
+              "name": "phone_number",
+              "value": "={{ $json.body.sender.phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "c606b268-e9ea-4a35-9c34-399f4328fe7b",
+              "name": "time_stamp",
+              "value": "={{ $json.body.conversation.timestamp }}",
+              "type": "string"
+            },
+            {
+              "id": "c0000826-953c-46ac-863e-de16324af713",
+              "name": "message_content",
+              "value": "={{ $json.body.conversation.messages[0].content }}",
+              "type": "string"
+            },
+            {
+              "id": "5327c8ee-9555-4050-9b6a-75840cefb9dd",
+              "name": "field_type",
+              "value": "={{ $json.body.conversation.messages[0].attachments[0].file_type }}",
+              "type": "string"
+            },
+            {
+              "id": "8ef73e97-d33b-4f26-9dcf-b94ba4bc29bc",
+              "name": "audio/imagen",
+              "value": "={{ $json.body.conversation.messages[0].attachments[0].data_url }}",
+              "type": "string"
+            },
+            {
+              "id": "664a6587-f7cd-49f4-a9c8-dadec57e4fba",
+              "name": "content_type",
+              "value": "={{ $json.body.conversation.messages[0].content_type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -960,
+        128
+      ],
+      "id": "097ae869-b0fa-4a32-86f8-defaca783a7f",
+      "name": "Variables"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "mensaje",
+        "key": "={{ $('Variables').item.json.account_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1456,
+        64
+      ],
+      "id": "86c9365b-02f7-4d37-834e-2755a018c975",
+      "name": "Redis1",
+      "credentials": {
+        "redis": {
+          "id": "OkUy9ZFGGcMJSJXm",
+          "name": "NeuzStudioCache2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 4,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1264,
+        64
+      ],
+      "id": "63b51b2e-c2cd-4d69-abd4-525570e03ab5",
+      "name": "Wait",
+      "webhookId": "e4987e98-826e-4d13-8565-f3d881b6d289"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Variables').item.json.account_id }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        64
+      ],
+      "id": "702db558-d625-47da-8789-8088f4506164",
+      "name": "Redis2",
+      "credentials": {
+        "redis": {
+          "id": "OkUy9ZFGGcMJSJXm",
+          "name": "NeuzStudioCache2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        -176
+      ],
+      "id": "ab8a10fe-4d81-47fe-8b9e-b1bdfb1826a2",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "operation": "llen",
+        "list": "={{ $('Variables').item.json.account_id }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        688,
+        48
+      ],
+      "id": "8cf64095-e1c7-4eca-b8ca-254acec700d2",
+      "name": "Redis3",
+      "credentials": {
+        "redis": {
+          "id": "OkUy9ZFGGcMJSJXm",
+          "name": "NeuzStudioCache2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4728bdc4-01f0-4c19-987d-b6cdf8cb28ab",
+              "leftValue": "={{ Object.values($json)[0] }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        864,
+        48
+      ],
+      "id": "63bb85ae-ca48-4e8f-a858-7f5aed5b327a",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $('Variables').item.json.account_id }}",
+        "messageData": "={{ JSON.stringify({\n\"mensaje\" : $('Mensaje unificado').item.json.mensaje,\n\"time\" : $('Variables').item.json.time_stamp,\n\"id\" : $('Variables').item.json.account_id\n}) }}",
+        "tail": true
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        64
+      ],
+      "id": "d8cba66c-4e4d-4e98-bd67-cb4797894df8",
+      "name": "Redis4",
+      "credentials": {
+        "redis": {
+          "id": "OkUy9ZFGGcMJSJXm",
+          "name": "NeuzStudioCache2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "084c22f6-1407-4092-b5b7-c114d01a7c6a",
+              "name": "mensaje",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        528,
+        48
+      ],
+      "id": "3bb276ad-2c87-40a3-aa65-16ba86831a20",
+      "name": "Mensaje unificado"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "24d5f7ca-8be1-4ffe-a408-3ea2c88eb475",
+              "leftValue": "={{ $json.body.conversation.labels }}",
+              "rightValue": "bot_silenciado",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            },
+            {
+              "id": "1e927e79-9cd4-4f91-b3e5-83ceeb4d2ba8",
+              "leftValue": "={{ $json.body.conversation.labels }}",
+              "rightValue": "venta",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            },
+            {
+              "id": "d02ccd45-0601-4701-8117-9100c714c264",
+              "leftValue": "={{ $json.body.conversation.labels }}",
+              "rightValue": "reunion",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1360,
+        112
+      ],
+      "id": "09ec2af3-c078-4b72-b54e-f44b7b73da91",
+      "name": "If2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -672,
+        -224
+      ],
+      "id": "bc5217e6-4628-4614-9d95-3eb925535446",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1904,
+        288
+      ],
+      "id": "d81d1ea6-50b8-4b41-b686-249afa47aab7",
+      "name": "OpenAI Chat Model2",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "openAiApi": {
+          "id": "vAoStjMPqy9711cA",
+          "name": "OpenAi (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Trabaja y recorda chats anteriores con los clientes. ",
+        "tableName": {
+          "__rl": true,
+          "value": "n8n_chat_histories",
+          "mode": "list",
+          "cachedResultName": "n8n_chat_histories"
+        },
+        "topK": 10,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        2480,
+        224
+      ],
+      "id": "786abb76-9cb5-4995-96f0-9c4ece139c36",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "WZETzkfN1F4MDmoC",
+          "name": "Supabase (AdminNeuz)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2480,
+        384
+      ],
+      "id": "3f46948e-fc81-419d-a82d-34262f475c08",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "vAoStjMPqy9711cA",
+          "name": "OpenAi (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Variables').item.json.conversation_id }}",
+        "contextWindowLength": 6
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        2064,
+        288
+      ],
+      "id": "dbf8da72-b032-42f4-9bde-0bd2497f9019",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "w9RMQAQWreGjo7DT",
+          "name": "Neuz Admin"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1hqCNCVCRmGAsBdj925GmEbFByefQiU190c96S2XIXLY/edit?tab=t.0#heading=h.yqumdtej6uts"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        2208,
+        592
+      ],
+      "id": "a0b1e454-222f-4f96-9c99-4a15372aecfc",
+      "name": "Politicas de trabajo",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "6TvOVKbZ9Mm5Jade",
+          "name": "Google Docs (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=### CONTEXTO DEL CHAT ACTUAL ###\n- **Mensaje del cliente:** {{ $json.mensaje }}\n\n### TAREA ###\nAnaliza el mensaje del cliente y responde siguiendo tus protocolos de Account Manager.",
+        "options": {
+          "systemMessage": "=<rol_y_objetivo>\nEres el Account Manager de Neuz Studio (agencia de marketing y diseño). Tu objetivo es calificar leads por mensaje de Instagram, entender su necesidad y guiarlos a una venta o a agendar una reunión.\n</rol_y_objetivo>\n\n<personalidad_y_estilo>\n- TONO OBLIGATORIO: Persona real del equipo escribiendo desde su celular.\n- VOSEO ARGENTINO: Trata al cliente de \"vos\" siempre (\"¿Cómo estás?\", \"fijate\", \"decime\", \"querés\").\n- LENGUAJE PROHIBIDO: \"Estimado\", \"Cordialmente\", \"Aguardamos su respuesta\", \"En qué te puedo ayudar\", o sonar como asistente virtual/IA.\n- FORMATO DE MENSAJE: \n  - Máximo 800 caracteres por mensaje, contanto los espacios.\n  - Emojis con moderación (1 o 2 máximo por mensaje).\n  - Solo signos de interrogación/exclamación de cierre (? !).\n  - Listas: Si pasas precios o beneficios, usa emojis como viñetas (ej: 💵, ✅, 🛠️), separa con salto de línea (\\n) y mantén descripciones breves.\n- REGLA DEL PING-PONG (CRÍTICA): Llevá la conversación paso a paso. Haz MÁXIMO 1 o 2 preguntas por mensaje. Espera siempre la respuesta del cliente antes de avanzar. NO envíes toda la información de golpe.\n- POSTURA REACTIVA, NO SERVIL (CRÍTICO):\n1. NO hagas preguntas de seguimiento (follow-up questions) al final de tus mensajes.\n2. Si ya entregaste la información solicitada o los links, finaliza el mensaje ahí.\n3. Evita frases como \"¿Querés que te ayude con algo más?\" o \"¿Te gustaría ver más ejemplos?\".\n4. Tu objetivo es ser eficiente y directo. Una vez cumplida la tarea, termina la conversación cordialmente sin invitar a más interacción innecesaria.\n<personalidad_y_estilo>\n\n<uso_de_herramientas>\nDEBES consultar tus herramientas/documentos para responder:\n1. \"Metodología de trabajo\": Expectativas post-venta.\n2. \"Políticas de trabajo\": Reglas, correcciones y horarios.\n3. \"Precios y servicios\": Extraer servicios y precios (Usa el nombre exacto de la columna \"Servicio\").\n4. \"Formas de pago\": Opciones de cobro.\n5. \"Ejemplos de trabajos\": Para compartir links de referencias de nuestros trabajos o portfolio.\n6. \"Urgencia\": Recargos por entregas rápidas.\n7. \"Registrar Ventas y Tareas\": Ejecutar SOLO cuando el pago esté confirmado.\n</uso_de_herramientas>\n\n<limites_comerciales_estrictos>\n- LÍMITE DE PLATAFORMA: Operas SOLO por Instagram. Para mostrar trabajos realizados, nuestro portfolio, tu única herramienta es enviar links de \"Ejemplos de trabajos\". NUNCA ofrezcas mails, adjuntos, ni PDFs.\n- REGLA DE PAÍS Y MONEDA (BLOQUEO CRÍTICO): \n  - Si no sabes el país del cliente: Pregúntalo de forma natural ANTES de dar cualquier precio. NO des montos numéricos hasta saber su país.\n  - Si es de ARGENTINA: Usa ÚNICAMENTE Pesos Argentinos (\"ARS\").\n  - Si es del EXTERIOR: Usa ÚNICAMENTE Dólares (\"USD\").\n  - NUNCA mezcles monedas ni inventes frases como \"o su equivalente en pesos\".\n- SERVICIOS FUERA DE LÍMITE: NO hacemos 3D, renders, ilustración hiperrealista, producción física, filmaciones (solo editamos), ni Ads. NO armamos propuestas previas, bocetos gratis ni pruebas. El diseño arranca tras el pago.\n- ARCHIVOS EDITABLES Y CANVA (BLOQUEO CRÍTICO): Tienes terminantemente PROHIBIDO ofrecer, vender o entregar \"archivos editables\", \"archivos fuente\", \"másters\", o \"plantillas en Canva\", Illustrator, Photoshop, etc. Solo entregamos diseños finales cerrados (JPG, PNG, MP4) y mockups para previsualizar. Si lo piden, aclara que por política del estudio solo se entregan archivos cerrados.\n- LIMITACIONES CREATIVAS Y DE IDEACIÓN: No realizamos el proceso creativo desde cero. NO inventamos ideas a partir de audios, canciones o conceptos abstractos, ni imaginamos por el cliente. Si un cliente pide que \"propongan un concepto\" o \"escuchen un audio para inspirarse\", debes aclarar amablemente que luego del pago, el diseñador necesitará que le provean una idea clara.\n- REGLA DE REFERENCIAS (BLOQUEO CRÍTICO): Tienes terminantemente PROHIBIDO pedirle al cliente que te envíe referencias, ejemplos de estilo, fotos o un brief. La recolección de referencias creativas es tarea exclusiva del diseñador humano y se hace ÚNICAMENTE DESPUÉS de que el pago esté confirmado. Si el cliente te manda referencias por su cuenta, agradécele, pero NO le pidas más detalles creativos.\n</limites_comerciales_estrictos>\n\n<flujo_de_operacion>\nSigue este orden cronológico para atender cada consulta:\n\nPASO 0: SALUDO INICIAL AMIGABLE\n- Si el cliente envía UNICAMENTE un saludo (ej: \"Hola\", \"Buenas\", \"Qué tal\") sin explicar qué necesita:\n  - Responde con un saludo cálido, natural y abierto. (Ej: \"¡Hola! ¿Cómo andás? Contame, ¿qué andabas buscando?\"). \n  - Tienes PROHIBIDO intentar adivinar, enlistar servicios, o preguntar si busca algo mensual/puntual en este primer mensaje. \n  - DETENTE AHÍ y espera a que el cliente te explique su necesidad.\n\nPASO 1: FILTRO DE VIABILIDAD Y DERIVACIÓN\n- POSTULANTES / BÚSQUEDA LABORAL: Si una persona escribe buscando trabajo, ofreciendo sus servicios como diseñador o queriendo sumarse al equipo, recomendale estar atento/a a las historias de Instagram donde siempre publican cuando buscan a alguien.\n- OFERTA DE SERVICIO: Si una persona escribe ofreciendo sus servicios de cualqueir tipo, ya sea que este vendiendo una aplicacion, algun software o cualquier cosa que requiera que \"NOSOTROS\" lo contratemos a èl, agradécele el interés y explícale amablemente que por el momento no estamos buscando ese tipo de servicios. \n- Si el cliente pide algo que está en los \"Servicios Fuera de Límite\" -> Explica amablemente que no hacemos eso y finaliza.\n- REGLA DE DERIVACIÓN Y \"GRISES\" (CRÍTICA): Evalúa si el pedido cae en:\n  A) Soportes Físicos: Pide aplicar diseño en ropa, merch, packaging, locales, vidrieras, envases, etc.\n  B) Fuera de Catálogo: Pide piezas editoriales, portadas musicales, cartas o piezas que NO estén listadas textualmente en \"Precios y servicios\".\n  C) Links de Ejemplo: El cliente envía algún enlace/link externo como referencia o ejemplo de lo que busca.\n-> ACCIÓN OBLIGATORIA: Si se cumple A, B o C, tienes PROHIBIDO cotizar a medias o intentar salvar la venta. Escribe ÚNICA Y EXCLUSIVAMENTE el comando en texto plano:\n[necesita]\nTienes prohibido saludar, dar explicaciones o usar emojis. Solo realiza esa acción exacta.\n\nPASO 2: DESAMBIGUACIÓN (Si pasó el Filtro 1)\n- Si el pedido es ambiguo (\"necesito un diseño\") -> Pregunta de forma natural qué busca específicamente para clasificarlo. NO asumas que son \"Adaptaciones\".\n\nPASO 3: COTIZACIÓN (Solo si el servicio está en \"Precios y servicios\")\n- CLIENTE TIPO A - ESTRATEGIA: Personas Profesionales/Emprendedores que buscan potenciar su marca, crecer en Instagram o necesitan ayuda en marketing/publicidad.\n  1. Si ya clasificaste a este usuario como TIPO A, antes de agendar una reunion explicale explícitamente que para esto no ofrecemos un \"paquete de diseño\" tradicional, sino un Servicio de Estrategia de Marketing, Donde desarrollamos una estrategia y una campaña personalizada para potenciar su marca, donde el diseño es solo una de las herramientas que usamos para lograr el objetivo.\nCierre: Decile que esto requiere un análisis de su caso en una reunión. Envía el link: https://calendly.com/neuzgraphics/30min\n- CLIENTE TIPO B (Retainer/Mensual/Gestión de redes): Son clientes que buscan tener una constancia con los servicios tradicionales que ofrecemos en la herramienta \"Precios y servicios\". Explica que requiere una estrategia armada. Pídele que agende reunión enviando el link: https://calendly.com/neuzgraphics/30min (No agendes por él).\n- CLIENTE TIPO C (Servicio único/Spot): \n  1. Aplica la REGLA DE PAÍS Y MONEDA.\n  2. Extrae y ofrécele TODAS las opciones o paquetes disponibles relacionados al servicio que busca. (Ej: Si pide un Logotipo, envíale el Logo base y todos los \"Packs Emprendedor\" que figuren en tu documento). Utiliza siempre el formato de listas con emojis para presentarlos.\n  3. Aclara que la demora es de 3-4 días hábiles y que incluye correcciones ilimitadas bajo la misma idea inicial.\n  4. Pregunta para cuándo lo necesita y DETENTE AHÍ (ESPERA su respuesta).\n\nPASO 4: REGLA DE URGENCIA\n- SOLO si el cliente indica que lo necesita en MENOS de 3-4 días hábiles, calcula el recargo con el documento \"Urgencia\".\n- Condiciones a aclarar: Se paga por adelantado.\n- DEBES incluir esta frase exacta: \"Tené en cuenta que la urgencia reduce los días de la primera entrega. Una vez enviada, las correcciones se trabajan de manera continua, con una tanda por día hábil, para garantizar rapidez sin perder calidad.\"\n- Entregas en el mismo día: Están PROHIBIDAS. Lo máximo es aplicar Urgencia Alta para entregar al día siguiente.\n\nPASO 5: CIERRE Y PAGOS\n- Tras la aceptación del presupuesto, envía \"Metodología de trabajo\" y \"Formas de pago\".\n- PREGUNTA DE CIERRE: Pregúntale únicamente con qué forma de pago prefiere avanzar.\n- Aclaraciones extra: \n  - Flyers animados: Siempre explica que se cobra el \"Flyer base\" + la animación. \n  - Animaciones externas: Explica que NO animamos diseños que no sean de Neuz Studio.\n</flujo_de_operacion>\n\n<protocolo_de_reuniones>\n1. Tras enviar el link de Calendly a un CLIENTE TIPO A, espera a que el cliente confirme que ya agendó su turno.\n2. Si el cliente confirma que ya agendó (ej: \"listo\", \"ya agendé\", \"ahí saqué turno\"), responde EXACTAMENTE esta frase: \"Genial, te esperamos en la reunion\"\n</protocolo_de_reuniones>\n\n<protocolo_de_pagos>\n1. Si el cliente dice \"ya pagué\" sin foto, exige amablemente la captura.\n2.a.Si el pago es sin urgencia, responde EXACTAMENTE: \"perfecto, entre los proximos 2 dias habiles se contactara un diseñador con vos\"\n2.b.Si el pago es con urgencia, responde EXACTAMENTE: \"perfecto, en el proximo dia habil se contactara un diseñador con vos\" \n3. INMEDIATAMENTE después, ejecuta la herramienta \"Registrar Ventas y Tareas\".\n</protocolo_de_pagos>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2208,
+        64
+      ],
+      "id": "18709f0e-83ed-4ff6-91db-a4f923955c56",
+      "name": "AI Agent (MAIN)"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1-V3Nbm1dHPIBu7pNudo2qEGUO8SIZlj6kEGiXRgJFl0/edit?tab=t.0"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        592
+      ],
+      "id": "86ce9359-2d66-42ce-afe3-c86990fa162d",
+      "name": "Metodología de trabajo",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "6TvOVKbZ9Mm5Jade",
+          "name": "Google Docs (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1y9c1IWVYv7hczYyWmC0_b09CzGCIkJogv8iMpX9LPz8/edit?tab=t.0#heading=h.3ww61v5iupnd"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        2640,
+        592
+      ],
+      "id": "d43bb7b0-72ad-42c5-84a0-b76e9c74ce52",
+      "name": "Ejemplos de trabajos",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "6TvOVKbZ9Mm5Jade",
+          "name": "Google Docs (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1CWh1S3RFqtUj4p28-i2ZH9N6mPVeN37WMp0cpGs1sGw/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1CWh1S3RFqtUj4p28-i2ZH9N6mPVeN37WMp0cpGs1sGw/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        2352,
+        592
+      ],
+      "id": "6a17eed8-ec0f-445f-b5eb-3d158fbaf26e",
+      "name": "Formas de pago",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LyN2lwmbl6mTTuWe",
+          "name": "Google Sheets (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1s4kNddfboJhmtKVbSD5l2vQ3EB5weU34hV7NeHN9HLc/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1s4kNddfboJhmtKVbSD5l2vQ3EB5weU34hV7NeHN9HLc/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        2800,
+        592
+      ],
+      "id": "c2894d31-7ca7-4694-9858-7aa23ab20c34",
+      "name": "Urgencia",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LyN2lwmbl6mTTuWe",
+          "name": "Google Sheets (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "servicios_precios"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        2048,
+        592
+      ],
+      "id": "7eef6575-a7da-4872-96d3-ee91a577f832",
+      "name": "Precios y Servicios",
+      "credentials": {
+        "supabaseApi": {
+          "id": "WZETzkfN1F4MDmoC",
+          "name": "Supabase (AdminNeuz)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "\"Utilizá esta herramienta para extraer y enviar todos los campos requeridos para el registo de ventas y tareas\"",
+        "workflowId": {
+          "__rl": true,
+          "value": "lmyf0lYdVLrEIqnQ",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/lmyf0lYdVLrEIqnQ",
+          "cachedResultName": "Registro Ventas y Tareas"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fieldMontoPago": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldMontoPago', ``, 'number') }}",
+            "fieldCliente": "={{ $('Webhook').first().json.body.sender.name }}",
+            "fieldQueCompro": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldQueCompro', ``, 'string') }}",
+            "fieldPais": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldPais', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fieldCliente",
+              "displayName": "fieldCliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "fieldQueCompro",
+              "displayName": "fieldQueCompro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "fieldMontoPago",
+              "displayName": "fieldMontoPago",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "fieldPais",
+              "displayName": "fieldPais",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1888,
+        592
+      ],
+      "id": "940b8dc3-7ead-4eb5-8e9f-79e7a401689a",
+      "name": "Registrar Ventas y Tareas"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5de0a9f2-49f4-464f-9189-aa721858d765",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "[necesita]",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2656,
+        64
+      ],
+      "id": "d0bfddc0-75d0-48b6-ad66-63896893d568",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bfe66914-03a6-4d9c-a2e9-3b662a702bf1",
+              "name": "mensaje",
+              "value": "={{ $('Redis1').item.json.mensaje.map(m => JSON.parse(m).mensaje).join(\". \") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1856,
+        64
+      ],
+      "id": "d924d3bb-d6a7-439b-9638-776baf44dd6f",
+      "name": "Juntar MSG"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://automatizaciones-n8n-evolution-api.rs2pvp.easypanel.host/message/sendText/neuz-bot",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "apikey",
+              "value": "D795DE4BBF0C-470B-B041-1688A14D2746"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"5491130482828\",\n  \"text\": \"Hola Neuz, hay una consulta nueva para responder de {{ $('Webhook').first().json.body.sender.name }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3392,
+        -144
+      ],
+      "id": "be6dffc0-6912-4009-a432-39172c037bac",
+      "name": "HTTP Request (EVOLUTION API)1",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "tableId": "consultas_ia",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "pregunta",
+              "fieldValue": "={{ $('Webhook').first().json.body.content }}"
+            },
+            {
+              "fieldId": "ig_id",
+              "fieldValue": "={{ $('Variables').item.json.conversation_id }}"
+            },
+            {
+              "fieldId": "respondida",
+              "fieldValue": "={{ false }}"
+            },
+            {
+              "fieldId": "instagram_usuario",
+              "fieldValue": "={{ $('Webhook').first().json.body.sender.name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3184,
+        -144
+      ],
+      "id": "3c45387c-a8ec-447e-a630-ffaee185d7f1",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "WZETzkfN1F4MDmoC",
+          "name": "Supabase (AdminNeuz)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  // 1. Viajamos al nodo 'Aggregate' para traer el array original separado por mensajes\n  const arrayMensajes = $('Juntar MSG').first().json.message;\n\n  if (arrayMensajes && Array.isArray(arrayMensajes)) {\n    // 2. Filtramos mágicamente: guardamos todo EXCEPTO lo que contenga la palabra \"[IMAGEN]\"\n    const soloTextoUsuario = arrayMensajes.filter(mensaje => !mensaje.includes('[IMAGEN]'));\n    \n    // 3. Ahora sí, concatenamos pero solo los mensajes reales del cliente\n    item.json.mensaje_limpio = soloTextoUsuario.join(\" \").trim();\n  } else {\n    // Fallback de seguridad\n    item.json.mensaje_limpio = $('Juntar MSG').first().json.mensaje; \n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2976,
+        -144
+      ],
+      "id": "6f281614-2c13-4dc4-a83d-02fb7a1da4cc",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://neuzstudiochatwoot.targan.cloud/api/v1/accounts/{{ $('Webhook').item.json.body.account.id }}/conversations/{{ $('Variables').item.json.conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"labels\": [\"bot_silenciado\"]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3600,
+        -144
+      ],
+      "id": "8fff60be-3000-4b81-af1b-f55ab09e8b85",
+      "name": "Etiqueta Chatwoot (bot_silenciado)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BgmVIlZDFkRewxUz",
+          "name": "Chatwoot Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map((item) => {\n  let text = item.json.output || \"\";\n  let textLower = text.toLowerCase();\n\n  // 1. Detección por coincidencia de frases exactas\n  const fraseVenta1 = \"perfecto, entre los proximos 2 dias habiles se contactara un diseñador con vos\";\n  const fraseVenta2 = \"perfecto, en el proximo dia habil se contactara un diseñador con vos\";\n  const fraseReunion = \"genial, te esperamos en la reunion\";\n\n  // Evaluamos si contiene alguna de las dos frases de venta\n  let esVenta = textLower.includes(fraseVenta1) || textLower.includes(fraseVenta2);\n  \n  // Evaluamos si contiene la frase de reunión\n  let esReunion = textLower.includes(fraseReunion);\n\n  // 2. Evaluamos si debe cerrar el chat\n  item.json.should_close = esVenta || esReunion;\n\n  // 3. Asignamos la etiqueta dinámica para Chatwoot\n  if (esReunion) {\n      item.json.etiqueta_cierre = \"reunion\";\n  } else if (esVenta) {\n      item.json.etiqueta_cierre = \"venta\";\n  }\n\n  // 4. Limpieza del texto final\n  let cleanOutput = text\n    .replace(/\\n{3,}/g, '\\n\\n') // Limpieza de saltos de línea extra\n    .trim(); \n\n  item.json.output = cleanOutput;\n  \n  // 5. ARMAMOS EL PAYLOAD PARA CHATWOOT ACÁ MISMO\n  item.json.chatwoot_payload = {\n    content: cleanOutput,\n    message_type: \"outgoing\",\n    private: false,\n    sender: {\n      type: \"bot\"\n    }\n  };\n  \n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2976,
+        80
+      ],
+      "id": "5da17950-53f0-4c8e-b6d5-714fad5415ce",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://neuzstudiochatwoot.targan.cloud/api/v1/accounts/{{ $('Webhook').item.json.body.account.id }}/conversations/{{ $('Webhook').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.chatwoot_payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3184,
+        80
+      ],
+      "id": "20d56c04-472c-4d80-ad01-0cd81479eaab",
+      "name": "HTTP Request (FINAL)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BgmVIlZDFkRewxUz",
+          "name": "Chatwoot Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6eba2b85-3acf-43fe-995a-818e846f7699",
+              "leftValue": "={{ $('Code in JavaScript').item.json.should_close }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3392,
+        80
+      ],
+      "id": "8e2b4069-97d7-49cd-9ecf-6dcb4be95536",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://neuzstudiochatwoot.targan.cloud/api/v1/accounts/{{ $('Webhook').item.json.body.account.id }}/conversations/{{ $('Variables').item.json.conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=={\n  \"labels\": [\"{{ $json.etiqueta_cierre }}\"]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3600,
+        64
+      ],
+      "id": "e4e24ff5-181b-4056-8a73-3e150b0fed24",
+      "name": "Etiquetas Reunion & Venta",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BgmVIlZDFkRewxUz",
+          "name": "Chatwoot Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "284ae32b-227c-45f0-bb73-9b8dcfdc51ad",
+              "leftValue": "={{ $json.body.conversation.messages[0].message_type }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -912,
+        -416
+      ],
+      "id": "6274f503-b637-4c17-9d57-82511f454f7d",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "82f98abe-3fa6-4e55-99b3-ef8db108f6f1",
+              "leftValue": "={{ $json.body.conversation.labels }}",
+              "rightValue": "bot_silenciado",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1136,
+        -400
+      ],
+      "id": "9be95e13-6bf5-42b0-9bff-6f2834fd6ed5",
+      "name": "If6"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -912,
+        -224
+      ],
+      "id": "d7972169-81c6-436f-815f-baab373b64d9",
+      "name": "No Operation, do nothing2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://neuzstudiochatwoot.targan.cloud/api/v1/accounts/{{ $json.body.account.id }}/conversations/{{ $json.body.conversation.id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"labels\": []\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -672,
+        -432
+      ],
+      "id": "01a4b5c8-8213-4697-8fba-c5ba0ee822d8",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BgmVIlZDFkRewxUz",
+          "name": "Chatwoot Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f45d48b3-a5f3-4c6a-b550-99acfde71cd3",
+              "leftValue": "={{ $('Webhook').item.json.body.conversation.messages[0].sender_type }}",
+              "rightValue": "Contact",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1152,
+        144
+      ],
+      "id": "00278f3e-88d6-443d-b103-f2a594e45416",
+      "name": "If7"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        368
+      ],
+      "id": "28e42d95-64c8-47c7-b555-1ae3fddc6592",
+      "name": "No Operation, do nothing3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (TRANSCRIPCION)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request (TRANSCRIPCION)": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Mensaje unificado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variables": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Mensaje unificado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Mensaje unificado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis1": {
+      "main": [
+        [
+          {
+            "node": "Redis2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Redis1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis2": {
+      "main": [
+        [
+          {
+            "node": "Juntar MSG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis3": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Redis4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis4": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensaje unificado": {
+      "main": [
+        [
+          {
+            "node": "Redis3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "If6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Politicas de trabajo": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent (MAIN)": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Metodología de trabajo": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejemplos de trabajos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formas de pago": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Urgencia": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Precios y Servicios": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Ventas y Tareas": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Juntar MSG": {
+      "main": [
+        [
+          {
+            "node": "AI Agent (MAIN)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request (EVOLUTION API)1": {
+      "main": [
+        [
+          {
+            "node": "Etiqueta Chatwoot (bot_silenciado)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (EVOLUTION API)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (FINAL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request (FINAL)": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Etiquetas Reunion & Venta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If6": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If7": {
+      "main": [
+        [
+          {
+            "node": "Variables",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "8ed8c387-8702-46f4-814c-029f8e2516e0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e9aa4fcc36de01cb192faebc915f2a52eb3f1080b8d8c878f24c05c1982b6938"
+  },
+  "id": "fXwkzHqfhazqzX62",
+  "tags": [
+    {
+      "updatedAt": "2026-04-21T19:02:37.107Z",
+      "createdAt": "2026-04-21T19:02:37.107Z",
+      "id": "mxuEARCBnEAJbeCi",
+      "name": "Dashboard-NeuzStudio"
+    }
+  ]
+}

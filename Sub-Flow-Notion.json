@@ -1,0 +1,243 @@
+{
+  "name": "Sub-Flow-Notion",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Procesar el registro de la siguiente venta con estos datos técnicos:\n\nPaís: {{ $json.fieldPais }}\n\nMonto: {{ $json.fieldMontoPago }}\n\nUtiliza tus herramientas de Notion para cargar esta información siguiendo las reglas que tenés en tu System Message.",
+        "options": {
+          "systemMessage": "=Rol:\nSos un Asistente Administrativo de alta precisión. Tu función es recibir un paquete de datos de una venta cerrada y replicar la información en las bases de datos de Notion correspondientes.\n\nDatos de entrada (Esquema Técnico):\nProcesarás los siguientes campos: {{ $json.fieldMontoPago }} y {{ $json.fieldPais }}.\n\nTus Tareas Obligatorias:\n\n1. Carga en \"CLIENTES PARTICULARES\" (Notion)\nUsá la herramienta correspondiente para cargar la informacion con esta lógica:\n\nLógica de Moneda:\n\nSi {{ $json.fieldPais }} es Argentina, cargá el valor de {{ $json.fieldMontoPago }} en la columna \"Pago en Pesos\".\n\nSi {{ $json.fieldPais }} es cualquier otro país, cargá el valor de {{ $json.fieldMontoPago }} en la columna \"Pago en USD\"."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9276177b-8e74-481a-b6e4-3393f6b7e94e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        208
+      ],
+      "id": "a44395c9-1f14-4fa1-85a6-e482644f438d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "vAoStjMPqy9711cA",
+          "name": "OpenAi (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "registro_notion",
+        "contextWindowLength": 1
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        176,
+        208
+      ],
+      "id": "af5cb679-8364-4af6-be1b-94a2c7edb66f",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "fieldCliente"
+            },
+            {
+              "name": "fieldQueCompro"
+            },
+            {
+              "name": "fieldMontoPago",
+              "type": "number"
+            },
+            {
+              "name": "fieldPais"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "a51725c2-5d84-4faa-8a80-3fbb28a186fb",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "31b92f6c-da7d-8179-8cd9-ccc7a1c851d4",
+          "mode": "list",
+          "cachedResultName": "CLIENTES PARTICULARES",
+          "cachedResultUrl": "https://www.notion.so/31b92f6cda7d81798cd9ccc7a1c851d4"
+        },
+        "title": "={{ $json.fieldCliente }}",
+        "simple": false,
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Que Compro|rich_text",
+              "textContent": "={{ $json.fieldQueCompro }}"
+            },
+            {
+              "key": "Pago en Pesos|number",
+              "numberValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('propertyValues1_Number', ``, 'number') }}"
+            },
+            {
+              "key": "Pago en USD|number",
+              "numberValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('propertyValues2_Number', ``, 'number') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        208
+      ],
+      "id": "097f9fc2-d827-48ac-9fc0-8335a173a567",
+      "name": "CLIENTES PARTICULARES",
+      "credentials": {
+        "notionApi": {
+          "id": "EBJ5GGYDOXu5UmZg",
+          "name": "Notion (NeuzStudio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "teamId": "a4920072-1796-4884-ace7-a5c76660732e",
+        "title": "={{ $('When Executed by Another Workflow').item.json.fieldCliente }} / {{ $('When Executed by Another Workflow').item.json.fieldQueCompro }}",
+        "additionalFields": {
+          "assigneeId": "a03212a1-6456-4732-82ac-589025e62bbf",
+          "stateId": "380b31fe-7060-468d-85fd-e6fd2e6fc4e6"
+        }
+      },
+      "type": "n8n-nodes-base.linear",
+      "typeVersion": 1.1,
+      "position": [
+        608,
+        0
+      ],
+      "id": "61a86f91-b38f-4d46-9b85-433678d89343",
+      "name": "Create an issue",
+      "credentials": {
+        "linearApi": {
+          "id": "zEj18GXI5y0WZ86q",
+          "name": "Linear (NeuzStudio)"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Create an issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CLIENTES PARTICULARES": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an issue": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "0b50cab2-d6bf-4018-9356-64ca67a1c8a4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e9aa4fcc36de01cb192faebc915f2a52eb3f1080b8d8c878f24c05c1982b6938"
+  },
+  "id": "lC721zKbpnAJHppM",
+  "tags": [
+    {
+      "updatedAt": "2026-03-12T01:36:38.926Z",
+      "createdAt": "2026-03-12T01:36:38.926Z",
+      "id": "NVGD51AV9HTs8bE6",
+      "name": "NeuzStudio"
+    }
+  ]
+}
